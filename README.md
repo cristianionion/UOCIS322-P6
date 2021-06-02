@@ -1,89 +1,57 @@
 # UOCIS322 - Project 6 #
-Brevet time calculator with AJAX, MongoDB, and a RESTful API!
+Brevet time calculator.
 
-## What is in this repository
-
-You have a minimal example of `docker-compose` in `DockerRestAPI`, using which you can create RESTful API-based services (as demonstrated in class). 
-
-## IMPORTANT NOTES
-
-**MAKE SURE TO USE THE SOLUTION `acp_times.py` from Canvas for this project!**
-
-**MAKE SURE TO KEEP YOUR FILES in `brevets`! REMOVE `DockerRestAPI` after you're done!**
-
-## Getting started 
-
-You will reuse *your* code from Project 5.
-
-Recall that you created the following functionalities:
-
-1. Add two buttons `Submit` and `Display` in the ACP calculator page.
-
-2. Upon clicking the `Submit` button, the control times should be inserted into a MongoDB database.
-
-3. Upon clicking the `Display` button, the entries from the database should be displayed in a new page.
-
-4. Handle error cases appropriately. For example, `Submit` should return an error if no control times are input. One can imagine many such cases: you'll come up with as many cases as possible.
-
-### Functionality you will add
-
-This project has following four parts. Change the values for host and port according to your machine, and use the web browser to check the results.
-
-* You will design RESTful service to expose what is stored in MongoDB. Specifically, you'll use the boilerplate given in DockerRestAPI folder, and create the following three basic APIs:
-    * "http://<host:port>/listAll" should return all open and close times in the database
-    * "http://<host:port>/listOpenOnly" should return open times only
-    * "http://<host:port>/listCloseOnly" should return close times only
-
-* You will also design two different representations: one in csv and one in json. For the above, JSON should be your default representation for the above three basic APIs. 
-    * "http://<host:port>/listAll/csv" should return all open and close times in CSV format
-    * "http://<host:port>/listOpenOnly/csv" should return open times only in CSV format
-    * "http://<host:port>/listCloseOnly/csv" should return close times only in CSV format
-
-    * "http://<host:port>/listAll/json" should return all open and close times in JSON format
-    * "http://<host:port>/listOpenOnly/json" should return open times only in JSON format
-    * "http://<host:port>/listCloseOnly/json" should return close times only in JSON format
-
-* You will also add a query parameter to get top "k" open and close times. For examples, see below.
-
-    * "http://<host:port>/listOpenOnly/csv?top=3" should return top 3 open times only (in ascending order) in CSV format 
-    * "http://<host:port>/listOpenOnly/json?top=5" should return top 5 open times only (in ascending order) in JSON format
-    * "http://<host:port>/listCloseOnly/csv?top=6" should return top 5 close times only (in ascending order) in CSV format
-    * "http://<host:port>/listCloseOnly/json?top=4" should return top 4 close times only (in ascending order) in JSON format
-
-* You'll also design consumer programs (e.g., in jQuery) to use the service that you expose. `website` inside `DockerRestAPI` is an example of that. It is uses PHP. You're welcome to use either PHP or jQuery to consume your services. NOTE: your consumer program should be in a different container like example in `DockerRestAPI`.
+author= Cristian Daniel Ion
+email= ion.cristian123@gmail.com
+repo= https://github.com/cristianionion/UOCIS322-P5
 
 
-## Tasks
+added RESTful service with json and csv representations to brevet calculator
 
-As always you'll turn in your `credentials.ini` using Canvas, which will point to your repository on GitHub, which should contain:
+"http://host:port/listAll" will return open and close times from db
+"http://host:port/listCloseOnly" will return just close times
+"http://host:port/listOpenOnly" will return just open times
 
-* The working application with all 4 parts.
+additionally, adding "/json" or "/csv" will specify the output into either json or csv format
 
-* `docker-compose.yml`.
-
-* An updated `README`.
-
-## Grading Rubric
-
-* If your code works as expected: 100 points. This includes:
-    * Basic APIs work as expected.
-    * Representations work as expected.
-    * Query parameter-based APIs work as expected.
-    * Consumer program works as expected. 
-
-* For each non-working API, 5 points will be docked off. If none of them work,
-  you'll get 35 points assuming
-    * `README` is updated with your name, email, and details.
-    * `docker-compose.yml` works/builds without any errors.
-    * `Dockerfile` is present. 
-    * `credentials.ini` is submitted with the correct URL of your repo.
-
-* If the `README` is not clear or missing, 5 points will be docked off. 
-
-* If `Dockerfile` or `docker-compose` is missing, doesn't build or doesn't run, **15** points will be docked off.
+if "?top="<int> is added after formatting specification, then only the top <int> times will be returned
 	
-* If `credentials.ini` is not submitted or the repo is not found, 0 will be assigned.
+brevet calculator can be found on the port specified by web in docker-compose.yml
+listAll, listCloseOnly, and listOpenOnly can be found on the port specified by restapi in docker-compose.yml
 
-## Credits
+to run: docker-compose up --build in the brevets directory
 
-Michal Young, Ram Durairajan, Steven Walton, Joe Istas.
+
+
+mongodb and two buttons implemented to brevet calculator
+
+submit button revieves input and inters it into a database
+submit also drops previeous database data before inserting the new input
+
+display button takes the data from database and sends it to a new html file. This file shows the user input in a different format.
+
+
+
+acp_times.py computes the open and close times of brevet control locations
+open and close times depend on the distance of the control locations
+to find the times we need, we divide the distance by the rate(distance/time) which will give us the correct time
+if a control distance is longer than other control rate ranges, the time is compensated by adding the time from previous rates up until the range of the control distance.
+Special case for closing times:
+	if the control distance is within 60km of the start, the close time will have an additional hour
+
+	
+open times (range, rate):
+	 0-200km , 34km/h
+	 200-400km , 32km/h
+	 400-600km , 30km/h
+	 600-1000km , 28km/h
+	 1000-1300km , 26km/h
+close times (range, rate):
+	 0-600km , 15km/h
+	 600-1000km , 11.428km/h
+	 1000-1300km , 13.333km/h
+	 
+	 
+Ex. opentime: if distance is 350, first 200km have a rate of 34, the last 150km have a rate of 32 so,
+	200/34 + 150/32 = decimal value of number of hours = 10.56985
+Ex. closetime: if distance is 50, time = 50/15 + 1 = 4.33333...
