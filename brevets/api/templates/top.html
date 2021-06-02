@@ -1,0 +1,7 @@
+<h1>
+    <?php
+    echo file_get_contents('http://'.$_ENV['BACKEND_ADDR'].':'.$_ENV['BACKEND_PORT'].'/listOpenOnly/json?top=5');
+    $obj = json_decode($json)
+    echo $obj->open
+    ?>
+</h1>

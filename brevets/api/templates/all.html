@@ -1,0 +1,5 @@
+<h1>
+    <?php
+    echo file_get_contents('http://'.$_ENV['BACKEND_ADDR'].':'.$_ENV['BACKEND_PORT'].'/listAll');
+    ?>
+</h1>
